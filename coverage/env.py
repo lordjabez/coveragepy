@@ -92,6 +92,10 @@ class PYBEHAVIOR(object):
     # PyPy3 has always omitted statements after return.
     omit_after_return = omit_after_jump or PYPY3
 
+    # Modules used to have firstlineno equal to the line number of the first
+    # real line of code.  Now they always start at 1.
+    module_firstline_1 = (PYVERSION >= (3, 10))
+
 # Coverage.py specifics.
 
 # Are we using the C-implemented trace function?
