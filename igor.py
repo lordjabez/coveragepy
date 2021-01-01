@@ -22,6 +22,7 @@ import zipfile
 
 import pytest
 
+from coverage import env
 
 @contextlib.contextmanager
 def ignore_warnings():
@@ -38,8 +39,8 @@ def ignore_warnings():
 def do_show_env():
     """Show the environment variables."""
     print("Environment:")
-    for env in sorted(os.environ):
-        print("  %s = %r" % (env, os.environ[env]))
+    for ev in sorted(os.environ):
+        print("  %s = %r" % (ev, os.environ[ev]))
 
 
 def do_remove_extension():
@@ -94,8 +95,8 @@ def make_env_id(tracer):
     """An environment id that will keep all the test runs distinct."""
     impl = platform.python_implementation().lower()
     version = "%s%s" % sys.version_info[:2]
-    if '__pypy__' in sys.builtin_module_names:
-        version += "_%s%s" % sys.pypy_version_info[:2]
+    if env.PYPY:
+        version += "_%s%s" % env.PYPYVERSION[:2]
     env_id = "%s%s_%s" % (impl, version, tracer)
     return env_id
 
@@ -108,6 +109,12 @@ def run_tests(tracer, *runner_args):
     if 'COVERAGE_ENV_ID' in os.environ:
         os.environ['COVERAGE_ENV_ID'] = make_env_id(tracer)
     print_banner(label_for_tracer(tracer))
+
+    # We use env here in igor, but we need it to consider the environment
+    # variables we just created. So remove it from sys.modules so that it
+    # will be executed again.
+    del sys.modules["coverage.env"]
+
     return pytest.main(list(runner_args))
 
 
@@ -325,8 +332,8 @@ def print_banner(label):
 
     version = platform.python_version()
 
-    if '__pypy__' in sys.builtin_module_names:
-        version += " (pypy %s)" % ".".join(str(v) for v in sys.pypy_version_info)
+    if env.PYPY:
+        version += " (pypy %s)" % ".".join(str(v) for v in env.PYPYVERSION)
 
     try:
         which_python = os.path.relpath(sys.executable)
