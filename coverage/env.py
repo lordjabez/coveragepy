@@ -25,8 +25,9 @@ if PYPY:
 PYPY2 = PYPY and PY2
 PYPY3 = PYPY and PY3
 
-JYTHON = (platform.python_implementation() == 'Jython')
-IRONPYTHON = (platform.python_implementation() == 'IronPython')
+CPYTHON = (platform.python_implementation() == "CPython")
+JYTHON = (platform.python_implementation() == "Jython")
+IRONPYTHON = (platform.python_implementation() == "IronPython")
 
 # Python behavior
 class PYBEHAVIOR(object):

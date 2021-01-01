@@ -74,7 +74,18 @@ def label_for_tracer(tracer):
 
 def should_skip(tracer):
     """Is there a reason to skip these tests?"""
-    if tracer == "py":
+    skipper = ""
+
+    # $set_env.py: COVERAGE_ONE_TRACER - Only run tests for one tracer.
+    only_one = os.environ.get("COVERAGE_ONE_TRACER")
+    if only_one:
+        if env.CPYTHON:
+            if tracer == "py":
+                skipper = "Only one tracer: no Python tracer for CPython"
+        else:
+            if tracer == "c":
+                skipper = "No C tracer for {}".format(platform.python_implementation())
+    elif tracer == "py":
         # $set_env.py: COVERAGE_NO_PYTRACER - Don't run the tests under the Python tracer.
         skipper = os.environ.get("COVERAGE_NO_PYTRACER")
     else:
